@@ -28,8 +28,11 @@ public $error = array();
     
     public function login() {
         $sql = "SELECT * from users WHERE uname = '".$this->uname."' AND password = '".$this->password."' AND status = 'Y'";
+        _D($sql);
         $res = $this->conn->query($sql);
+        
         $result = $this->getArray($res);
+        _DX($res);
         //_D($result);
         $this->id = $result[0]['id'];
         //_DX(count($result));
