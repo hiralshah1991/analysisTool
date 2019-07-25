@@ -16,7 +16,7 @@ public $error = array();
     
     public function setPostVars(){
         foreach($_POST as $k=>$v){
-            $this->$k=$v;
+            $this->$k=mysqli_real_escape_string($this->conn,$v);
         }
     }
     
@@ -28,14 +28,10 @@ public $error = array();
     
     public function login() {
         $sql = "SELECT * from users WHERE uname = '".$this->uname."' AND password = '".$this->password."' AND status = 'Y'";
-        _D($sql);
-        $res = $this->conn->query($sql);
         
+        $res = $this->conn->query($sql);
         $result = $this->getArray($res);
-        _DX($res);
-        //_D($result);
         $this->id = $result[0]['id'];
-        //_DX(count($result));
         if(count($result) != 1){
             return false;
         }
