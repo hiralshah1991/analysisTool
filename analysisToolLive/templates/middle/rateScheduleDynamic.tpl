@@ -162,7 +162,7 @@ div.row .col-md-6 .col-md-9 div{float:left; padding:0px 0px 8px 0px;}
 												<span class="required"> * </span>
 											</label>
 											<div class="col-md-9">
-												<input name="name_season_1" type="text">
+												<input class="form-control" name="name_season_1" type="text">
 												<div id="form_error_season_1_name"></div>
 											</div>
 										</div>
@@ -179,18 +179,33 @@ div.row .col-md-6 .col-md-9 div{float:left; padding:0px 0px 8px 0px;}
 												<div id="form_error_date_range_season_1"></div>
 											</div>
 										</div>
-										<div class="form-group col-md-6">
-											<label class="control-label col-md-3">Season Abbrevation</label>
-											<div class="col-md-9">
-												<input name="abbrevation_season_1" type="text">
+										
+										<div class="form-group col-md-12">
+											<div class="col-md-6 checkbox-list">
+												<label><input type="checkbox" class="form-control" name="tou_season_1" value="1"> Has Time Of Use</label>
+											</div>
+											<div class="col-md-6 checkbox-list" id="tou_tp_season_1_div" style="display:none">
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="onpeak" data-season="1" data-dayrange="1"> On Peak</label>
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="midpeak" data-season="1" data-dayrange="1"> Mid Peak</label>
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="partialpeak" data-season="1" data-dayrange="1"> Partial Peak</label>
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="offpeak" data-season="1" data-dayrange="1"> Off Peak</label>
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="superoffpeak" data-season="1" data-dayrange="1"> Super Off Peak</label>
+												<label class="checkbox-inline"><input type="checkbox" class="form-control" name="tou_tp_season_1[]" value="criticalpeak" data-season="1" data-dayrange="1"> Critical Peak</label>
 											</div>
 										</div>
-										<div class="form-group col-md-6">
-											
-											<div class="col-md-12">
-												<input type="checkbox" name="tou_season_1"> Has Time OF Use
-											</div>
+										
+										<div class="form-group col-md-12 checkbox-list" id="time_range_season_1" style="display:none">
+											<h4 class="col-md-12 block">TIME OF USE RANGES 1</h4>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="1"> Monday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="2"> Tuesday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="3"> Wednesday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="4"> Thursday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="5"> Friday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="6"> Saturday</label>
+											<label class="checkbox-inline"><input type="checkbox" class="form-control" name="daysofweek_season_1_1[]" value="7"> Sunday</label>
 										</div>
+										<div class="form-group col-md-12" id="timeRangediv_season_1"></div>
+										
 									</div>
 								</div>
 								<div class="tab-pane active" id="tab3">
@@ -664,6 +679,55 @@ div.row .col-md-6 .col-md-9 div{float:left; padding:0px 0px 8px 0px;}
 {literal}
 
 $(document).ready(function(){
+	
+	$('input[name^="tou_season_"]').change(function(){
+		var id = $(this).val();
+		if($(this).is(':checked')){
+			$('#tou_tp_season_'+id+'_div').show();
+			$('#time_range_season_'+id).show();
+		}else{
+			$('#tou_tp_season_'+id+'_div').hide();
+			$('#time_range_season_'+id).hide();
+		}
+	});
+	
+	$('input[name^="tou_tp_season_"]').change(function(){
+		
+		var seasonId = $(this).data('season');
+		var tpval = $(this).val();
+		
+		if($(this).is(':checked')){
+			
+			var tp = $(this).closest('label').text();
+			
+			var dayRange = $(this).data('dayrange');
+			
+			var appTp = '<div class="col-md-6" id="'+tpval+'_range_season_'+seasonId+'">\
+						 	<label class="col-md-3 control-label">'+tp+':</label>\
+							<div class="col-md-9">\
+						 		<div data-rownum="0">\
+									<div class="col-md-4">\
+										<div class="input-icon"><i class="fa fa-clock-o"></i><input type="text" class="form-control timepicker timepicker-24" name="usage_time_range_season_'+seasonId+'_'+dayRange+'['+tp+'][from][]" ></div>\
+									</div>\
+									<label class="control-label col-md-2">To</label>\
+									<div class="col-md-4">\
+									<div class="input-icon"><i class="fa fa-clock-o"></i> <input type="text" class="form-control timepicker timepicker-24" name="usage_time_range_season_'+seasonId+'_'+dayRange+'['+tp+'][to][]" ></div>\
+									</div>\
+									<div class="col-md-1">\
+									<span name="add_0" data-name="" data-tp="'+tp+'"><i class="fa fa-plus"></i></span>\
+									<span name="remove_0" style="display:none"><i class="fa fa-minus"></i></span>\
+									</div>\
+									</div>\
+									</div>\
+								</div>';
+			$('#timeRangediv_season_'+seasonId).append(appTp);
+			ComponentsPickers.init();
+												
+		}else{
+			$('#'+tpval+'_range_season_'+seasonId).remove();
+		}
+	});
+	
 	$('input[name="s1_usage_times[]"]').each(function(){
 		var tp = $(this).val();
 		var usageTimeName = 's1_usagetime_'+tp;
@@ -725,7 +789,6 @@ $(document).on('click','[name^=add_]',function(){
 	var nextRowIDRemove = 'remove_'+nextRowNumber;
 	
 	if(detachRowElement != ""){
-		alert(detachRowElement)
 		detachRowElement.appendTo($(this).parent('div').parent('div').parent('div'));
 	}else{
 		detachRowNum = '';
